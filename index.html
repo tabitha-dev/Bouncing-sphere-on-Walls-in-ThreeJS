@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Bouncing Sphere Animation</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+   
+  <script>
+    // Setup Three.js scene and camera
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+
+
+    // Create a sphere geometry
+    var geometry = new THREE.SphereGeometry(1, 60, 60);
+
+    // Create a Phong material and set its color to red
+    var material = new THREE.MeshPhongMaterial({
+      color: 0xff0000
+    });
+
+    // Create a mesh object using the sphere geometry and material
+    var mesh = new THREE.Mesh(geometry, material);
+
+    // Set the initial position of the mesh object
+    mesh.position.x = -2;
+    mesh.position.y = 1;
+
+    // Add the mesh object to the scene
+    scene.add(mesh);
+
+    var boxGeometry = new THREE.BoxGeometry(25, 15, 10);
+    var boxMaterial = new THREE.MeshPhongMaterial({color: 0x404040, side: THREE.DoubleSide});
+    var box = new THREE.Mesh(boxGeometry, boxMaterial);
+    box.castShadow = true;
+
+    box.position.x = -2;
+    box.position.y = 1;
+    scene.add(box);
+
+    // Add lights to the scene
+    var ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    var pointLight = new THREE.PointLight(0xffff00, 1, 100);
+    //pointLight.position.set(-2, 0, 0);
+    pointLight.position.set(-10, 9, 1);
+    pointLight.shadow.camera.near = 0.1;
+    pointLight.shadow.camera.far = 100;
+    pointLight.shadow.mapSize.width = 1024;
+    pointLight.shadow.mapSize.height = 1024;
+    pointLight.castShadow = true;
+    scene.add(pointLight);
+
+    // Add a new point light to the scene and position it in the upper left corner
+    var cornerLight = new THREE.PointLight(0xFFFAAA, 1, 100);
+    cornerLight.position.set(-10, 9, 1);
+    scene.add(cornerLight);
+
+
+    // Create a renderer and set its size to match the window
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // Add the renderer to the document
+    document.body.appendChild(renderer.domElement);
+
+    // Define the limits of the viewing area
+    var maxX = 2.5;
+    var maxY = 2.5;
+    var minX = -2.5;
+    var minY = -2.5;
+
+    // Define the initial direction of the Sphere
+    var xDirection = 1;
+    var yDirection = 1;
+
+    // Define the color array and index
+    var colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff];
+    var colorIndex = 0;
+
+    // Define the animation function
+    function animate() {
+      // Request the next frame of the animation
+      requestAnimationFrame(animate);
+
+      // Move the mesh object in the x and y direction
+      mesh.position.x += 0.05 * xDirection;
+      mesh.position.y += 0.05 * yDirection;
+
+      // Check if the mesh object has gone beyond the viewing area and change its direction if it has
+      if (mesh.position.x >= maxX || mesh.position.x <= minX) {
+        xDirection *= -1;
+        // Change the color of the mesh object when it hits a boundary
+        mesh.material.color.setHex(colors[colorIndex]);
+        colorIndex = (colorIndex + 1) % colors.length;
+      }
+
+      if (mesh.position.y >= maxY || mesh.position.y <= minY) {
+        yDirection *= -1;
+        // Change the color of the mesh object when it hits a boundary
+        mesh.material.color.setHex(colors[colorIndex]);
+        colorIndex = (colorIndex + 1) % colors.length;
+      }
+
+      // Rotate the mesh object
+      mesh.rotation.x += 0.01;
+      mesh.rotation.y += 0.01;
+
+      // Render the scene
+      renderer.render(scene, camera);
+    }
+
+    // Call the animate function to start the animation
+    animate();
+  </script>
+</body>
+
+</html>
